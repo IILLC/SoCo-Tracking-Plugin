@@ -1,7 +1,7 @@
 <?php
 
 //this is the code that works with EXPENDITURES
-// --> VIEW
+// --> VIEW 
 // --> ADD
 
 //function to add action for download expense CSV :: download_expenditure_csv
