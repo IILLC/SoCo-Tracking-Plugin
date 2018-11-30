@@ -5,22 +5,22 @@
 // --> ADD
 
 //function to add action for download expense CSV :: download_expenditure_csv
-add_action("init", "download_expenditure_csv");
+add_action( "init", "download_expenditure_csv" );
 
 function download_expenditure_csv() {
 
 	//only run if the download_csv button has been clicked
-	if (isset($_POST['download_expenditure_csv'])) {
+	if ( isset( $_POST['download_expenditure_csv'] ) ) {
 
 		$data = soco_get_expenditure_view();
 		
 		//only output csv if there is returned date
-		if (!empty($data)){
+		if ( !empty( $data ) ){
 			$delimiter = ",";
-			$filename = "expenditures_" . date('Y-m-d') . ".csv";
+			$filename = "expenditures_" . date( 'Y-m-d' ) . ".csv";
 
 			//create a file pointer
-			$f = fopen('php://memory', 'w');
+			$f = fopen( 'php://memory', 'w' );
 
 			//set column headers
 			$fields = array (
@@ -31,40 +31,21 @@ function download_expenditure_csv() {
 				'exDate',
 				'exPaymentType',
 				'exAccountNumber',
-				'exPayeeId',
-				'exPayeeType',
-				'exOrgId',
-				'exOrgName',
-				'exFirstName',
-				'exMiddleName',
-				'exLastName',
-				'exNameSuffix',
-				'exAddress1',
-				'exAddress2',
-				'exCity',
-				'exState',
-				'exZip',
-				'exElectioneering',
-				'exIndependent',
-				'exCommDates',
-				'exCommMethod',
-				'exCommText',
-				'exExplanation'
+				'exPayeeId'
 			);
-			fputcsv($f, $fields, $delimiter);
+			fputcsv( $f, $fields, $delimiter );
 
 			//output each row of the data, format line as csv and write to file pointer
-			foreach ($data as $d){
-				//formatting a few entries so they appear correctly in the csv for the traccer file
-				$amount = number_format($d->amount,2);
-				//$amount = "-"."$amount";
-				$expenditure_date = DateTime::createFromFormat('Y-m-d', $d->expenditure_date)->format('m/d/Y');
-				if ($d->electioneering){
+			foreach ( $data as $d ){
+				//formatting a few entries so they appear correctly
+				$amount = number_format( $d->amount,2 );
+				$expenditure_date = DateTime::createFromFormat( 'Y-m-d', $d->expenditure_date )->format( 'm/d/Y' );
+				if ( $d->electioneering ){
 					$electioneering = "Y";
 				} else {
 					$electioneering = "N";
 				}
-				if ($d->independent){
+				if ( $d->independent ){
 					$independent = "Y";
 				} else {
 					$independent = "N";
@@ -78,55 +59,33 @@ function download_expenditure_csv() {
 					$expenditure_date,
 					$d->receipt_value,
 					'',
-					$d->payee_number,
-					$d->payee_type_value,
-					'',
-					$d->organization_name,
-					$d->contact_first_name,
-					$d->contact_middle_name,
-					$d->contact_last_name,
-					'',
-					$d->address1,
-					$d->address2,
-					$d->city,
-					$d->state_abbr,
-					$d->zip_code, 
-					$electioneering,
-					$independent,
-					'',
-					'',
-					'',
-					''
+					$d->payee_number
 				);
-				fputcsv($f, $line_data, $delimiter);
+				fputcsv( $f, $line_data, $delimiter );
 			}
 
 			//move back to beginning of file
-			fseek($f, 0);
+			fseek( $f, 0 );
 
 			//set headers to download file rather than displayed
-			header('Content-Type: text/csv');
-			header('Content-Disposition: attachment; filename="' . $filename . '";');
+			header( 'Content-Type: text/csv' );
+			header( 'Content-Disposition: attachment; filename="' . $filename . '";' );
 
 			//output all remaining data on a file pointer
-			fpassthru($f);
+			fpassthru( $f );
 		}
 		exit;
-
 	}
-
 }
 
 
-
-/// AJAX for DISPLAY VIEW EXPENSES
 	//ajax to change if a expenditure is active
-add_action('wp_ajax_change_expenditureAJAX', 'change_expenditureAJAX_callback');
+add_action( 'wp_ajax_change_expenditureAJAX', 'change_expenditureAJAX_callback' );
 function change_expenditureAJAX_callback() {
 	global $wpdb;
 	$expenditure_id = $_POST['expenditure_id'];
 	$active_record = $_POST['active_record'];
-	$dateTimeNow = date('Y-m-d H:i:s');
+	$dateTimeNow = date( 'Y-m-d H:i:s' );
 	
 	$wpdb->update(
 					'soco_expenditures',
@@ -140,20 +99,19 @@ function change_expenditureAJAX_callback() {
 				);
 }
 
-
 function change_expenditureAJAX_javascript() {
-	$adminAJAX =  admin_url('admin-ajax.php');  
+	$adminAJAX =  admin_url( 'admin-ajax.php' );  
 ?>
 <script type="text/javascript" language="JavaScript">
-jQuery(document).ready(function($) { 	
-	jQuery(function($) {
+jQuery( document ).ready( function( $ ) { 	
+	jQuery( function( $ ) {
 		$( "button[name=btn_change_expenditure]" )
 			.button()
-			.click(function( event ) {
+			.click( function( event ) {
 				var active_record = $( this ).val();
 				var expenditure_id = $( this ).next().val();
 			
-				if (active_record == 1) {
+				if ( active_record == 1 ) {
 					var action_name = "return";
 					var message = "Expenditure Returned";
 				} else {
@@ -161,30 +119,24 @@ jQuery(document).ready(function($) {
 					var message = "Expenditure Removed";
 				}
 			
-				var action = confirm("Are you sure you want to " + action_name + " this expenditure?");
+				var action = confirm( "Are you sure you want to " + action_name + " this expenditure?" );
 					
-				if (action){
-					var ajaxurl = <?php echo json_encode($adminAJAX); ?>;
+				if ( action ){
+					var ajaxurl = <?php echo json_encode( $adminAJAX ); ?>;
 					var data = {
 								action: 'change_expenditureAJAX',
 								expenditure_id: expenditure_id,
 								active_record: active_record
 							   };
-	//            //WP ajax call
 					
-					$.post(ajaxurl, data)
-					  .done(function( data, success ) {
-						//alert( "Data Loaded: " + data );
-						$('#spn-buttons-' + expenditure_id).html('<div class="alert alert-success" role="alert"><strong>' + message + '</strong></div>')
+					$.post( ajaxurl, data )
+					  .done( function( data, success ) {
+						$( '#spn-buttons-' + expenditure_id ).html( '<div class="alert alert-success" role="alert"><strong>' + message + '</strong></div>' );
 					  })
 					.fail(function() {
-						//alert( "error" );
-						$('#spn-buttons-' + expenditure_id).html('<div class="alert alert-danger" role="alert"><strong>Oops!</strong> Something went wrong. Pleas reload the page and try again.</div>');
+						$( '#spn-buttons-' + expenditure_id ).html( '<div class="alert alert-danger" role="alert"><strong>Oops!</strong> Something went wrong. Pleas reload the page and try again.</div>');
 					  });
 
-				} else {
-					//alert("You clicked NO. Action cancled.");
-						
 				}
       });
   });
@@ -198,16 +150,16 @@ jQuery(document).ready(function($) {
 function soco_display_expenses() {
 		
 	$start_date = $_GET["start-date"];
-	if (empty($start_date)){ $start_date = date( 'Y-m-d', strtotime( '-90 days' ) ); }
+	if ( empty( $start_date ) ){ $start_date = date( 'Y-m-d', strtotime( '-90 days' ) ); }
 
 	$end_date = $_GET["end-date"];
-	if (empty($end_date)){ $end_date = date( 'Y-m-d' ); }
+	if ( empty( $end_date ) ){ $end_date = date( 'Y-m-d' ); }
 
 	$min_amount = $_GET["min-amount"];
-	if (empty($min_amount)){ $min_amount = 0; }
+	if ( empty( $min_amount ) ){ $min_amount = 0; }
 
 	$max_amount = $_GET["max-amount"];
-	if (empty($max_amount)){ $max_amount = 999999; }
+	if ( empty( $max_amount ) ){ $max_amount = 999999; }
 	
 	$organization_id = $_GET["slct-organization-id"];
 	
@@ -215,7 +167,7 @@ function soco_display_expenses() {
 	
 	$payment_id = $_GET["slct-payment-type"];
 	
-	if (isset($_GET['ckbx-active'])){
+	if ( isset( $_GET['ckbx-active'] ) ){
 		$deleted_checked = "checked";
 	} else {
 		$deleted_checked = "";
@@ -226,16 +178,16 @@ function soco_display_expenses() {
 	
 	$expenditure_results = soco_get_expenditure_view();
 	
-	$record_count = count($expenditure_results);
+	$record_count = count( $expenditure_results );
 	
-	if ($record_count > 999){
+	if ( $record_count > 999 ){
 		$too_many_message = '<div class="alert alert-warning" role="alert">
 			  <strong>Too Many Records!</strong> Please narrow your search range to limit results.
 			</div>';
 	}
 
 	//disables csv button if there are no results
-	if (empty($expenditure_results)) { $disabled = "disabled";}
+	if ( empty( $expenditure_results ) ) { $disabled = "disabled";}
 
 //////////////search form start//////////////////
 	
@@ -259,7 +211,7 @@ function soco_display_expenses() {
 
 					$organization_list = soco_organization_list ();
 					foreach ($organization_list as $ol) { 
-						$expenditure_output  .= '<option value="'.$ol->idorganization_list.'"'.(($organization_id == $ol->idorganization_list) ? ' selected="selected">' : '>' ).' '.$ol->organization_name.'</option>';
+						$expenditure_output  .= '<option value="'.$ol->idorganization_list.'"'.( ( $organization_id == $ol->idorganization_list ) ? ' selected="selected">' : '>' ).' '.$ol->organization_name.'</option>';
 					} 
 
 	$expenditure_output  .= '</select>
@@ -269,8 +221,8 @@ function soco_display_expenses() {
 					<option value="" >All Types</option>';
 
 					$expenditure_type_list = soco_expenditure_type_list ();
-					foreach ($expenditure_type_list as $el) { 
-						$expenditure_output  .= '<option value="'.$el->idexpenditure_type_list.'"'.(($expenditure_type_id == $el->idexpenditure_type_list) ? ' selected="selected">' : '>' ).' '.$el->expenditure_type_name.'</option>';
+					foreach ( $expenditure_type_list as $el ) { 
+						$expenditure_output  .= '<option value="'.$el->idexpenditure_type_list.'"'.( ( $expenditure_type_id == $el->idexpenditure_type_list ) ? ' selected="selected">' : '>' ).' '.$el->expenditure_type_name.'</option>';
 					} 
 
 	$expenditure_output  .= '</select>
@@ -281,8 +233,8 @@ function soco_display_expenses() {
 					<option value="" selected>All Types</option>';
 	//this is the event list. Strangely named
 	$payment_type_list = soco_payment_type_list ();
-	foreach ($payment_type_list as $pl) { 
-		$expenditure_output .= '<option value="'.$pl->idreceipt_type_list.'"'.(($payment_id == $pl->idreceipt_type_list) ? ' selected="selected">' : '>' ).' '.$pl->receipt_name.'</option>';
+	foreach ( $payment_type_list as $pl ) { 
+		$expenditure_output .= '<option value="'.$pl->idreceipt_type_list.'"'.( ( $payment_id == $pl->idreceipt_type_list ) ? ' selected="selected">' : '>' ).' '.$pl->receipt_name.'</option>';
 	}
 	
 	$expenditure_output  .= '</select>
@@ -312,7 +264,7 @@ function soco_display_expenses() {
 			  <th scope="col">Action</th>
 			</tr>';
  	
-	 	foreach ($expenditure_results as $er) {  
+	 	foreach ( $expenditure_results as $er ) {  
 			$expenditure_output.= '
 			<tr>
 			  <td>'.$er->expenditure_date.'</td>
@@ -321,7 +273,7 @@ function soco_display_expenses() {
 			  <td>'.$er->expenditure_type_name.'</td>
 			  <td>'.$er->receipt_name.'</td>
 			  <td><span id="spn-buttons-'.$er->idexpenditures.'" ><button name="btn_edit_contribution" name="btn_edit_expediture" title="Click this to edit this record."><a href="../add-expenditure?expenditure_id='.$er->idexpenditures.'" title="Click this to edit this expenditure"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></button>';
-			if ($deleted_checked == "checked"){
+			if ( $deleted_checked == "checked" ){
 				//showing deleted things - need add button
 				$expenditure_output  .= '<button name="btn_change_expenditure" name="btn_change_expenditure" value="1" title="Click this button to return this record to an active expenditure."><i class="fa fa-undo" aria-hidden="true"></i></button>
 				<input type="hidden" name="hdn_expenditure_id" value="'.$er->idexpenditures.'">';
@@ -348,7 +300,6 @@ function soco_display_expenses() {
 		return $expenditure_output;
 	}
 
-/////// ADD EXPENDITURE FORM
 // this creates the edit/new expenditures HTML for the shortcode ////////////////////////////
 function soco_display_expenditure_form() {
 	global $wpdb;	
@@ -357,7 +308,7 @@ function soco_display_expenditure_form() {
 	$alert = "";
 
 	//sets a flag to whether we are adding a new record or updating an old one
-	if (isset($_GET['expenditure_id'])) {
+	if ( isset( $_GET['expenditure_id'] ) ) {
 		//update
 		$database_action = "update";
 		$text_action = "update";
@@ -366,31 +317,22 @@ function soco_display_expenditure_form() {
 		$database_action = "insert";
 		$text_action = "add";
 	}
-///debug////////
-//	print_r('$database_action= ');
-//	print_r($database_action);
-//	print_r('$text_action= ');
-//	print_r($text_action);
-///////////////////////////////	
 
 	//Is this a POST - If so time to modify the database
-	if ((isset($_POST["hdn-form-post"])) && ($_POST["hdn-form-post"] == 1)){
-		//is post - do stuff!
-
+	if ( ( isset( $_POST["hdn-form-post"] ) ) && ( $_POST["hdn-form-post"] == 1 ) ){
 		//checks for entrys in required fields
-		if ( (isset($_POST['slct-payee-type']) ) && 
-			(isset($_POST['slct-organization']) ) && 
-			(isset($_POST['expenditure-date']) ) && 
-			(isset($_POST['expenditure-amount']) ) && 
-			(isset($_POST['slct-expenditure-type']) ) &&
-			(isset($_POST['slct-payment-type']) ) &&
-			(isset($_POST['slct-disbursement-type']) ) &&
-			(isset($_POST['slct-payer-type']) ) ) {
-			//all fields are filled out - lets process
+		if ( ( isset ($_POST['slct-payee-type'] ) ) && 
+			( isset( $_POST['slct-organization'] ) ) && 
+			( isset( $_POST['expenditure-date'] ) ) && 
+			( isset( $_POST['expenditure-amount'] ) ) && 
+			( isset( $_POST['slct-expenditure-type'] ) ) &&
+			( isset( $_POST['slct-payment-type'] ) ) &&
+			( isset( $_POST['slct-disbursement-type'] ) ) &&
+			( isset( $_POST['slct-payer-type'] ) ) ) {
 
-			$user_id = get_current_user_id( );
+			$user_id = get_current_user_id();
 			
-			if ($database_action == "insert") { ////////insert action/////////////
+			if ( $database_action == "insert" ) { 
 				$db_action = $wpdb->insert( 
 					'soco_expenditures', 
 					array( 
@@ -410,14 +352,14 @@ function soco_display_expenditure_form() {
 					)
 				);
 			
-				if ($db_action == 1){ //checks to see if WP returned an error or not. 0 is FAIL, over 0 is success
+				if ( $db_action == 1 ){ //checks to see if WP returned an error or not. 0 is FAIL, over 0 is success
 					$added = 1;
 					$new_expenditure_id = $wpdb->insert_id;
 				} else {
 					$added = 0;	
 				}
 			
-			} elseif ( $database_action == "update" ) { ///////update action/////////////
+			} elseif ( $database_action == "update" ) { 
 				$db_action = $wpdb->update( 
 					'soco_expenditures', 
 					array( 
@@ -446,21 +388,7 @@ function soco_display_expenditure_form() {
 
 			}
 
-	////////////// debug info /////////////////////////////			
-//					$wpdb->show_errors();
-//					$wpdb->print_error();
-//					print_r('$$db_action= ');
-//					print_r($db_action);
-//				
-//			
-//			print_r('$added= ');
-//			print_r($added);
-//			print_r('$new_expenditure_id= ');
-//			print_r($new_expenditure_id);
-//			
-//////////////////////////////////////////////////////				
-		
-		} elseif ($_POST['hdn-form-post'] == 1) {
+		} elseif ( $_POST['hdn-form-post'] == 1 ) {
 			//something missing. Return data and add error to page
 			$alert = '<div class="alert alert-danger" role="alert">
 		  Please check the form and try to save it again. Make sure all required fields are filled in. 
@@ -483,9 +411,9 @@ function soco_display_expenditure_form() {
 		$alert .= "";
 	}
 
-	if ($expenditure_id > 0){
+	if ( $expenditure_id > 0 ){
 		//lets get contibution data and set it.
-		$expenditure_data = soco_expenditure_data($expenditure_id);
+		$expenditure_data = soco_expenditure_data( $expenditure_id );
 	}
 	
 	
@@ -507,8 +435,8 @@ function soco_display_expenditure_form() {
 					<option value="" selected>Select...</option>';
 
 	$payee_type_list = soco_contributor_type_list ();
-	foreach ($payee_type_list as $pt) { 
-		$form_output_string .= '<option value="'.$pt->idcontributor_type_list.'"'.(($expenditure_data->payee_type_value == $pt->idcontributor_type_list) ? ' selected="selected">' : '>' ).' '.$pt->contributor_type_name.'</option>';
+	foreach ( $payee_type_list as $pt ) { 
+		$form_output_string .= '<option value="'.$pt->idcontributor_type_list.'"'.( ( $expenditure_data->payee_type_value == $pt->idcontributor_type_list) ? ' selected="selected">' : '>' ).' '.$pt->contributor_type_name.'</option>';
 	} 
 	
 	$form_output_string .= '</select>
@@ -518,7 +446,7 @@ function soco_display_expenditure_form() {
 					<option value="" selected>Click first letter of the name to Select...</option>';
 
 	$organization_list = soco_organization_list ();
-	foreach ($organization_list as $ol) { 
+	foreach ( $organization_list as $ol ) { 
 		$form_output_string .= '<option value="'.$ol->idorganization_list.'"'.(($expenditure_data->organization_id == $ol->idorganization_list) ? ' selected="selected">' : '>' ).' '.$ol->organization_name.'</option>';
 	} 
 	$form_output_string .= '</select>
@@ -540,8 +468,8 @@ function soco_display_expenditure_form() {
 					<option value="" selected>Select...</option>';
                 		
 							$expenditure_list = soco_expenditure_type_list ();
-						 	foreach ($expenditure_list as $cl) { 
-                        	    $form_output_string .= '<option value="'.$cl->idexpenditure_type_list.'"'.(($expenditure_data->expenditure_type_id == $cl->idexpenditure_type_list) ? ' selected="selected">' : '>' ).' '.$cl->expenditure_type_name.'</option>';
+						 	foreach ( $expenditure_list as $cl ) { 
+                        	    $form_output_string .= '<option value="'.$cl->idexpenditure_type_list.'"'.( ( $expenditure_data->expenditure_type_id == $cl->idexpenditure_type_list ) ? ' selected="selected">' : '>' ).' '.$cl->expenditure_type_name.'</option>';
                         	} 
 	$form_output_string .= '</select>
 			</div>
@@ -551,9 +479,9 @@ function soco_display_expenditure_form() {
 					<option value="" selected>Select...</option>';
 
 	$receipt_list = soco_receipt_type_list ();
-	foreach ($receipt_list as $rl) { 
-		$form_output_string .= '<option value="'.$rl->idreceipt_type_list.'"'.(($expenditure_data->payment_type_id == $rl->idreceipt_type_list) ? ' selected="selected">' : '>' ).' '.$rl->receipt_name.'</option>';
-	} 
+	foreach ( $receipt_list as $rl ) { 
+		$form_output_string .= '<option value="'.$rl->idreceipt_type_list.'"'.( ( $expenditure_data->payment_type_id == $rl->idreceipt_type_list ) ? ' selected="selected">' : '>' ).' '.$rl->receipt_name.'</option>';
+	}  
     
 	$form_output_string .= '</select>
 			</div>
@@ -564,7 +492,7 @@ function soco_display_expenditure_form() {
 				<strong>Electioneering</strong>: <br />
 				<select name="slct-electioneering" required>';
 				
-				if ($expenditure_data->electioneering == 1 ) {
+				if ( $expenditure_data->electioneering == 1 ) {
 					$form_output_string .=
 						'<option value="0" >No</option>
 						<option value="1" selected>Yes</option>';
@@ -581,7 +509,7 @@ function soco_display_expenditure_form() {
 				<strong>Independent</strong>: <br />
 				<select name="slct-independent" required>';
 				
-				if ($expenditure_data->independent == 1 ) {
+				if ( $expenditure_data->independent == 1 ) {
 					$form_output_string .=
 						'<option value="0" >No</option>
 						<option value="1" selected>Yes</option>';
@@ -598,17 +526,14 @@ function soco_display_expenditure_form() {
 				<select name="slct-disbursement-type" required>';
                 		
 					$disbursement_list = soco_contribution_type_list ();
-					foreach ($disbursement_list as $cl) { 
-                        $form_output_string .= '<option value="'.$cl->idcontribution_type_list.'"'.(( $expenditure_data->disbursement_type_id == $cl->idcontribution_type_list) ? ' selected="selected">' : '>' ).' '.$cl->contribution_type_name.'</option>';
+					foreach ( $disbursement_list as $cl ) { 
+                        $form_output_string .= '<option value="'.$cl->idcontribution_type_list.'"'.( ( $expenditure_data->disbursement_type_id == $cl->idcontribution_type_list ) ? ' selected="selected">' : '>' ).' '.$cl->contribution_type_name.'</option>';
                     } 
 	$form_output_string .= '</select>
 			</div>			
 			
-			
 		</div> <!-- closes flexrow -->
 		</div> <!-- closes altertbox -->';
-		
-
 		
 	$form_output_string .= 'Please enter the below information for internal use.
 	<div class="flex-container">
@@ -616,7 +541,7 @@ function soco_display_expenditure_form() {
 			<strong>Reimbursement</strong>: <br />
 			<select name="slct-reimbursement" required>';
 				
-				if ($expenditure_data->reimbursement == 1 ) {
+				if ( $expenditure_data->reimbursement == 1 ) {
 					$form_output_string .=
 						'<option value="0" >No</option>
 						<option value="1" selected>Yes</option>';
@@ -635,28 +560,27 @@ function soco_display_expenditure_form() {
 
 	//this is the event list. Strangely named
 	$payer_list = soco_payer_list ();
-	foreach ($payer_list as $pl) { 
-		$form_output_string .= '<option value="'.$pl->idsoco_payer_list.'"'.(($expenditure_data->payer_id == $pl->idsoco_payer_list) ? ' selected="selected">' : '>' ).' '.$pl->soco_payer_name.'</option>';
+	foreach ( $payer_list as $pl ) { 
+		$form_output_string .= '<option value="'.$pl->idsoco_payer_list.'"'.( ( $expenditure_data->payer_id == $pl->idsoco_payer_list ) ? ' selected="selected">' : '>' ).' '.$pl->soco_payer_name.'</option>';
 	} 
 	$form_output_string .=  '</select>
 			</div>
 
 			<div class="flex-item">';
-	$textLeft = 500 - strlen($expenditure_data->expenditure_notes );             
+	$textLeft = 500 - strlen( $expenditure_data->expenditure_notes );             
 	$form_output_string .=  '<strong>Notes</strong>: <span id="counterEditNotes">Characters Left: '.$textLeft.'</span> <br />
 				<textarea name="txar-expenditure-notes" id="txar-expenditure-notes" maxlength="500" cols="50" rows="3">'.$expenditure_data->expenditure_notes.'</textarea>
 <!-- quick little counter script for usability --> 
   				<script type="text/javascript">
-                    jQuery("#txar-expenditure-notes").keyup(function () {
-                        var left = 500 - jQuery(this).val().length;
-                        jQuery("#counterEditNotes").text("Characters Left: " + left);
+                    jQuery( "#txar-expenditure-notes" ).keyup( function () {
+                        var left = 500 - jQuery( this ).val().length;
+                        jQuery( "#counterEditNotes" ).text( "Characters Left: " + left );
                     });
                     </script>
 <!-- End counter usability script -->
 			</div>
 		</div> <!-- closes flexrow -->
-			
-			
+
 		<br />
 		<input type="hidden" id="txtPhoneNo" name="hdn-form-post" value="1" >
 		<input type="hidden" name="hdn-expenditure-id" value="'.$expenditure_data->idexpenditures.'" >
@@ -668,8 +592,5 @@ function soco_display_expenditure_form() {
 	
 	return $form_output_string;
 	}
-
-
-
 
 ?>
