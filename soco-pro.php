@@ -11,10 +11,10 @@ License:      Plugin Copyright @ Image Innovations, LLC
 
 //other code for plugin
 require_once('soco-pro-lists.php'); //functions for the lists
-require_once('soco_contributions.php'); //functions for the contributions
-require_once('soco_donor.php'); //functions for the donors
-require_once('soco_expenditures.php'); //functions expenditures
-require_once('soco_organizations.php'); //functions expenditures
+require_once('soco-contributions.php'); //functions for the contributions
+require_once('soco-donor.php'); //functions for the donors
+require_once('soco-expenditures.php'); //functions expenditures
+require_once('soco-organizations.php'); //functions expenditures
 
 
 //required enqueue scripts and styles
