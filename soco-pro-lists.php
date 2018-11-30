@@ -1,15 +1,6 @@
 <?php
 //this file holds all the funcitons for the lists needed for the plugin
 
-//function template for list
-//function template_for_list (){
-//	global $wpdb;
-//	$sql = "";
-//	$results = $wpdb->get_results($sql);
-//
-//	return $results;
-//}
-
 //list to get contribution category type
 function soco_contribution_category_type_list (){
 	global $wpdb;
@@ -22,7 +13,7 @@ function soco_contribution_category_type_list (){
 	  soco_contribution_category_list
 	ORDER BY
 	  soco_contribution_category_list.idcontribution_category_list";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -39,7 +30,7 @@ function soco_contribution_type_list (){
 	  soco_contribution_type_list
 	ORDER BY
 	  soco_contribution_type_list.tracer_value";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -56,7 +47,7 @@ function soco_receipt_type_list (){
 	  soco_receipt_or_payment_type_list
 	ORDER BY
 	  soco_receipt_or_payment_type_list.receipt_value";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -73,7 +64,7 @@ function soco_contributor_type_list (){
 	  soco_contributor_type_list
 	ORDER BY
 	  soco_contributor_type_list.tracer_value";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -90,7 +81,7 @@ function soco_occupation_type_list (){
 	  soco_occupation_list
 	ORDER BY
 	  soco_occupation_list.tacer_value";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -107,7 +98,7 @@ function soco_gift_type_list (){
 	  soco_gift_type_list
 	ORDER BY
 	  soco_gift_type_list.gift_name";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -140,7 +131,7 @@ function soco_get_donor_list (){
 	  INNER JOIN soco_occupation_list ON soco_donor_list.occupation_id = soco_occupation_list.idoccupation_list
 	ORDER BY
 	  soco_donor_list.last_name";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -157,7 +148,7 @@ function soco_state_list (){
 	  soco_state_list
 	ORDER BY
 	  soco_state_list.state_name";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -174,7 +165,7 @@ function soco_occupation_list (){
 	  soco_occupation_list
 	ORDER BY
 	  soco_occupation_list.occupation_name";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 	
@@ -192,7 +183,7 @@ function soco_payer_list (){
 	  soco_payer_list
 	ORDER BY
 	  soco_payer_list.idsoco_payer_list";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -202,43 +193,28 @@ function soco_get_contributions_view ( $start_date = null, $end_date = null, $mi
 	global $wpdb;
 
 	$start_date = $_GET["start-date"];
-	if (empty($start_date)){ $start_date = date( 'Y-m-d', strtotime( '-90 days' ) ); }
+	if ( empty( $start_date ) ){ $start_date = date( 'Y-m-d', strtotime( '-90 days' ) ); }
 
 	$end_date = $_GET["end-date"];
-	if (empty($end_date)){ $end_date = date( 'Y-m-d' ); }
+	if ( empty( $end_date ) ){ $end_date = date( 'Y-m-d' ); }
 
 	$min_amount = $_GET["min-amount"];
-	if (empty($min_amount)){ $min_amount = 0; }
+	if ( empty( $min_amount ) ){ $min_amount = 0; }
 
 	$max_amount = $_GET["max-amount"];
-	if (empty($max_amount)){ $max_amount = 999999; }
+	if ( empty( $max_amount ) ){ $max_amount = 999999; }
 
 	$donor_id = $_GET["slct-donor"];
-	if (!empty($donor_id)){ $donor_sql = "AND soco_contributions.donor_id = $donor_id"; } //add line to sql
+	if ( !empty( $donor_id ) ){ $donor_sql = "AND soco_contributions.donor_id = $donor_id"; } //add line to sql
 
 	$event_id = $_GET["slct-category-type"];
-	if (!empty($event_id)){ $event_sql = "AND soco_contributions.event_id = $event_id"; } //add line to sql
+	if ( !empty( $event_id ) ){ $event_sql = "AND soco_contributions.event_id = $event_id"; } //add line to sql
 	
 	if ( $_GET['ckbx-active'] == "on" ){
 		$active_checked = 0;
 	} else {
 		$active_checked = 1;
 	}
-
-/*	print_r('<br /> $start_date= ');
-		print_r($start_date);
-		print_r('<br /> $end_date= ');
-		print_r($end_date);
-		print_r('<br /> $min_amount= ');
-		print_r($min_amount);
-		print_r('<br /> $max_amount= ');
-		print_r($max_amount);
-		print_r('<br /> $donor_id= ');
-		print_r($donor_id);
-		print_r('<br /> $event_id= ');
-		print_r($event_id);
-*/
-	
 	
 	$sql = "
 	SELECT
@@ -293,19 +269,15 @@ function soco_get_contributions_view ( $start_date = null, $end_date = null, $mi
 	  soco_donor_list.last_name,
 	  soco_contributions.amount
 	LIMIT 1000";
-	$results = $wpdb->get_results($sql);
-	
-//	print_r('$sql query= ');
-//	print_r($sql);
-	
+	$results = $wpdb->get_results( $sql );
+
 	return $results;
 }
 
-
 //function to get contribution data
-function soco_contribution_data($contribution_id){
+function soco_contribution_data( $contribution_id ){
 	global $wpdb;
-	if ($contribution_id > 0) {
+	if ( $contribution_id > 0 ) {
 		$contribution_data_sql = "
 		SELECT
 		  soco_contributions.idcontributions,
@@ -325,15 +297,15 @@ function soco_contribution_data($contribution_id){
 		  soco_contributions
 		WHERE
 		  soco_contributions.idcontributions = $contribution_id";
-		$contribution_data = $wpdb->get_row($contribution_data_sql);
+		$contribution_data = $wpdb->get_row( $contribution_data_sql );
 	}
 	return $contribution_data;
 }
 
 //function to get the donor informations
-function soco_donor_data ($donor_id){
+function soco_donor_data ( $donor_id ){
 	global $wpdb;
-	if ($donor_id > 0) {
+	if ( $donor_id > 0 ) {
 		$sql = "
 		SELECT
 		  soco_donor_list.individual,
@@ -358,16 +330,16 @@ function soco_donor_data ($donor_id){
 		  INNER JOIN soco_state_list ON soco_donor_list.state_id = soco_state_list.state_id
 		WHERE
 		  soco_donor_list.iddonor = $donor_id";
-		$results = $wpdb->get_row($sql);
+		$results = $wpdb->get_row( $sql );
 	}
 	return $results;
 }
 
 
 //quick function to format numbers to make them more readable.
-function localize_us_number($phone) {
-  $numbers_only = preg_replace("/[^\d]/", "", $phone);
-  return preg_replace("/^1?(\d{3})(\d{3})(\d{4})$/", "$1-$2-$3", $numbers_only);
+function localize_us_number( $phone ) {
+  $numbers_only = preg_replace( "/[^\d]/", "", $phone );
+  return preg_replace( "/^1?(\d{3})(\d{3})(\d{4})$/", "$1-$2-$3", $numbers_only );
 }
 
 //function to retrieve data for the display expenditures view function (or other functions).
@@ -375,25 +347,25 @@ function soco_get_expenditure_view ( $start_date = null, $end_date = null, $min_
 	global $wpdb;
 	
 	$start_date = $_GET["start-date"];
-	if (empty($start_date)){ $start_date = date( 'Y-m-d', strtotime( '-90 days' ) ); }
+	if ( empty( $start_date ) ){ $start_date = date( 'Y-m-d', strtotime( '-90 days' ) ); }
 
 	$end_date = $_GET["end-date"];
-	if (empty($end_date)){ $end_date = date( 'Y-m-d' ); }
+	if ( empty( $end_date ) ){ $end_date = date( 'Y-m-d' ); }
 
 	$min_amount = $_GET["min-amount"];
-	if (empty($min_amount)){ $min_amount = 0; }
+	if ( empty( $min_amount ) ){ $min_amount = 0; }
 
 	$max_amount = $_GET["max-amount"];
-	if (empty($max_amount)){ $max_amount = 999999; }
+	if ( empty( $max_amount ) ){ $max_amount = 999999; }
 
 	$organization_id = $_GET["slct-organization-id"];
-	if (!empty($organization_id)){ $organization_sql = "AND soco_expenditures.organization_id = $organization_id"; } //add line to sql
+	if ( !empty( $organization_id ) ){ $organization_sql = "AND soco_expenditures.organization_id = $organization_id"; } //add line to sql
 	
 	$expenditure_id = $_GET["slct-expenditure-type"];
-	if (!empty($expenditure_id)){ $expenditure_sql = "AND soco_expenditure_type_list.idexpenditure_type_list = $expenditure_id"; } //add line to sql
+	if ( !empty( $expenditure_id ) ){ $expenditure_sql = "AND soco_expenditure_type_list.idexpenditure_type_list = $expenditure_id"; } //add line to sql
 
 	$payment_id = $_GET["slct-payment-type"];
-	if (!empty($payment_id)){ $payment_sql = "AND soco_expenditures.payment_type_id = $payment_id"; } //add line to sql
+	if ( !empty( $payment_id ) ){ $payment_sql = "AND soco_expenditures.payment_type_id = $payment_id"; } //add line to sql
 	
 	if ( $_GET['ckbx-active'] == "on" ){
 		$active_checked = 0;
@@ -401,19 +373,6 @@ function soco_get_expenditure_view ( $start_date = null, $end_date = null, $min_
 		$active_checked = 1;
 	}
 
-//	print_r('<br /> $start_date= ');
-//		print_r($start_date);
-//		print_r('<br /> $end_date= ');
-//		print_r($end_date);
-//		print_r('<br /> $min_amount= ');
-//		print_r($min_amount);
-//		print_r('<br /> $max_amount= ');
-//		print_r($max_amount);
-//		print_r('<br /> $expenditure_id= ');
-//		print_r($expenditure_id );
-//		print_r('<br /> $event_id= ');
-//		print_r($expenditure_id);
-	
 	$sql = "
 	SELECT
 	  soco_expenditures.idexpenditures,
@@ -469,11 +428,8 @@ function soco_get_expenditure_view ( $start_date = null, $end_date = null, $min_
 	  soco_expenditures.amount
 	  
 	LIMIT 1000";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 	
-//	print_r('$sql query= ');
-//	print_r($sql);
-//	
 	return $results;
 }
 
@@ -489,7 +445,7 @@ function soco_expenditure_type_list (){
 	  soco_expenditure_type_list
 	ORDER BY
 	  soco_expenditure_type_list.tracer_value";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -506,7 +462,7 @@ function soco_payee_type_list (){
 	  soco_payee_type_list
 	ORDER BY
 	  soco_payee_type_list.tracer_value";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -528,7 +484,7 @@ function soco_organization_list (){
 	  soco_organization_list
 	ORDER BY
 	  soco_organization_list.organization_name";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
@@ -545,13 +501,13 @@ function soco_payment_type_list (){
 	  soco_receipt_or_payment_type_list
 	ORDER BY
 	  soco_receipt_or_payment_type_list.receipt_value";
-	$results = $wpdb->get_results($sql);
+	$results = $wpdb->get_results( $sql );
 
 	return $results;
 }
 
 //function to get expenditure data
-function soco_expenditure_data ($expenditure_id = null){
+function soco_expenditure_data ( $expenditure_id = null ){
 	global $wpdb;
 	$sql = "
 	SELECT
@@ -598,13 +554,9 @@ function soco_expenditure_data ($expenditure_id = null){
 	  LEFT JOIN soco_state_list ON soco_organization_list.state_id = soco_state_list.state_id
 	WHERE
 		soco_expenditures.idexpenditures = $expenditure_id";
-	$results = $wpdb->get_row($sql);
+	$results = $wpdb->get_row( $sql );
 
 	return $results;
 }
-
-
-	
-	
 
 ?>
